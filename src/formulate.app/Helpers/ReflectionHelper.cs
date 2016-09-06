@@ -50,29 +50,6 @@
         public static T[] InstantiateInterfaceImplementations<T>()
         {
 
-            // Return instances.
-            var instances = GetTypesImplementingInterface<T>()
-                .Select(x => Activator.CreateInstance(x))
-                .Where(x => x is T)
-                .Where(x => x != null)
-                .Select(x => (T)x).ToArray();
-            return instances;
-
-        }
-
-
-        /// <summary>
-        /// Returns the types that implement an interface.
-        /// </summary>
-        /// <typeparam name="T">
-        /// The interface type.
-        /// </typeparam>
-        /// <returns>
-        /// The types.
-        /// </returns>
-        public static Type[] GetTypesImplementingInterface<T>()
-        {
-
             // Variables.
             var interfaceType = typeof(T);
             var types = default(List<Type>);
@@ -91,10 +68,29 @@
             // Add types to cache?
             if (types == null)
             {
-                types = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(x => x.GetTypes())
-                    .Where(x => interfaceType.IsAssignableFrom(x)
-                        && !x.IsInterface).ToList();
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                //var types1 = assemblies.SelectMany(x => x.GetTypes());
+                List<Type> types1 = new List<Type>();
+
+                foreach(var assembly in assemblies)
+                {
+                    try
+                    { 
+                    types1.AddRange(assembly.GetTypes());
+                    }
+                    catch (System.Reflection.ReflectionTypeLoadException)
+                    {
+                    // There's an error caused by a loaded type that still needs to be resolved.
+                    }
+                }
+                
+
+                types = types1.Where(x => interfaceType.IsAssignableFrom(x)  && !x.IsInterface).ToList();
+                //    .SelectMany(x => x.GetTypes())
+                //types = AppDomain.CurrentDomain.GetAssemblies()
+                //    .SelectMany(x => x.GetTypes())
+                //    .Where(x => interfaceType.IsAssignableFrom(x)
+                //        && !x.IsInterface).ToList();
                 lock (TypeMapLock)
                 {
                     TypeMap[interfaceType] = types;
@@ -102,8 +98,13 @@
             }
 
 
-            // Return types.
-            return types.ToArray();
+            // Return instances.
+            var instances = types
+                .Select(x => Activator.CreateInstance(x))
+                .Where(x => x is T)
+                .Where(x => x != null)
+                .Select(x => (T)x).ToArray();
+            return instances;
 
         }
 
