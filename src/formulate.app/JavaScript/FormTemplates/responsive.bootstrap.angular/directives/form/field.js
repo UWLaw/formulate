@@ -97,6 +97,14 @@ function createTextAreaField(field) {
     return setGlobalInputAttributes(field, el);
 }
 
+function createTextBlockField(field) {
+    var el = angular.element('<p></p>');
+
+    el.text(field.label);
+
+    return el;
+}
+
 function createSubmitField(field) {
     var el = angular.element('<button></button>');
     var span = angular.element('<span></span>');
