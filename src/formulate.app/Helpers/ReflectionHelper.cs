@@ -1,4 +1,4 @@
-﻿namespace formulate.app.Helpers
+namespace formulate.app.Helpers
 {
 
     // Namespace.
@@ -89,17 +89,37 @@
 
 
             // Add types to cache?
-            if (types == null)
-            {
-                types = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(x => x.GetTypes())
-                    .Where(x => interfaceType.IsAssignableFrom(x)
-                        && !x.IsInterface).ToList();
-                lock (TypeMapLock)
+             if (types == null)
                 {
-                    TypeMap[interfaceType] = types;
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    //var types1 = assemblies.SelectMany(x => x.GetTypes());
+                    List<Type> types1 = new List<Type>();
+
+                    foreach (var assembly in assemblies)
+                    {
+                        try
+                        {
+                            types1.AddRange(assembly.GetTypes());
+                        }
+                        catch (System.Reflection.ReflectionTypeLoadException)
+                        {
+                            // There's an error caused by a loaded type here that still needs to be resolved.
+                        }
+                    }
+
+
+                    types = types1.Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface).ToList();
+                    //    .SelectMany(x => x.GetTypes())
+                    //types = AppDomain.CurrentDomain.GetAssemblies()
+                    //    .SelectMany(x => x.GetTypes())
+                    //    .Where(x => interfaceType.IsAssignableFrom(x)
+                    //        && !x.IsInterface).ToList();
+                    lock (TypeMapLock)
+                    {
+                        TypeMap[interfaceType] = types;
+                    }
+
                 }
-            }
 
 
             // Return types.
