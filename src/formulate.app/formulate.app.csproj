@@ -328,6 +328,7 @@
     <Compile Include="Forms\Fields\Upload\UploadField.cs" />
     <Compile Include="Forms\Fields\TextArea\TextAreaField.cs" />
     <Compile Include="Forms\Fields\Text\TextField.cs" />
+    <Compile Include="Forms\Fields\TextBlock\TextBlockField.cs" />
     <Compile Include="Forms\Form.cs" />
     <Compile Include="Forms\FormField.cs" />
     <Compile Include="Forms\FormFieldMetaInfo.cs" />
