@@ -97,6 +97,26 @@ function createTextAreaField(field) {
     return setGlobalInputAttributes(field, el);
 }
 
+function createToggleTextField(field) {
+    var container = angular.element('<div></div>');
+    var label = angular.element('<label class="formulate__checkbox-label"></label>');
+    var el = angular.element('<input type="checkbox" value="1" />');
+    var span = angular.element('<span></span>');
+
+    span.text(field.label);
+
+    label.append(setGlobalInputAttributes(field, el, {
+        formControl: false,
+        disableAutocomplete: false
+    }));
+    label.append(span);
+
+    container.addClass('formulate__checkbox');
+    container.append(label);
+
+    return container;
+}
+
 function createSubmitField(field) {
     var el = angular.element('<button></button>');
     var span = angular.element('<span></span>');
@@ -150,6 +170,10 @@ function createField(field) {
     case 'textarea':
         addLabel(elWrap, field);
         elWrap.append(createTextAreaField(field));
+        break;
+
+    case 'toggletext':
+        elWrap.append(createToggleTextField(field));
         break;
 
     case 'checkbox':
